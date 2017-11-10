@@ -46,6 +46,9 @@ fi
 if [ ! -n "${BULLETTRAIN_PROMPT_ROOT+1}" ]; then
   BULLETTRAIN_PROMPT_ROOT=true
 fi
+if [ ! -n "${BULLETTRAIN_PROMPT_CHAR_ROOT+1}" ]; then
+  BULLETTRAIN_PROMPT_CHAR_ROOT="#"
+fi
 if [ ! -n "${BULLETTRAIN_PROMPT_SEPARATE_LINE+1}" ]; then
   BULLETTRAIN_PROMPT_SEPARATE_LINE=true
 fi
@@ -201,6 +204,12 @@ if [ ! -n "${BULLETTRAIN_PERL_PREFIX+1}" ]; then
 fi
 
 # CONTEXT
+if [ ! -n "${BULLETTRAIN_CONTEXT_ROOT_BG+1}" ]; then
+  BULLETTRAIN_CONTEXT_ROOT_BG=black
+fi
+if [ ! -n "${BULLETTRAIN_CONTEXT_ROOT_FG+1}" ]; then
+  BULLETTRAIN_CONTEXT_ROOT_FG=red
+fi
 if [ ! -n "${BULLETTRAIN_CONTEXT_BG+1}" ]; then
   BULLETTRAIN_CONTEXT_BG=black
 fi
@@ -358,7 +367,8 @@ context() {
 
 prompt_context() {
   local _context="$(context)"
-  [[ -n "$_context" ]] && prompt_segment $BULLETTRAIN_CONTEXT_BG $BULLETTRAIN_CONTEXT_FG "$_context"
+  [[ -n "$_context" && "$UID" -eq 0 ]] && prompt_segment $BULLETTRAIN_CONTEXT_ROOT_BG $BULLETTRAIN_CONTEXT_ROOT_FG "%F{$BULLETTRAIN_CONTEXT_ROOT_FG}$_context"
+  [[ -n "$_context" && "$UID" -ne 0 ]] && prompt_segment $BULLETTRAIN_CONTEXT_USER_BG $BULLETTRAIN_CONTEXT_USER_FG "$_context"
 }
 
 # Based on http://stackoverflow.com/a/32164707/3859566
@@ -601,9 +611,10 @@ prompt_status() {
 # Prompt Character
 prompt_chars() {
   local bt_prompt_chars="${BULLETTRAIN_PROMPT_CHAR}"
+  local bt_prompt_chars_root="${BULLETTRAIN_PROMPT_CHAR_ROOT}"
 
   if [[ $BULLETTRAIN_PROMPT_ROOT == true ]]; then
-    bt_prompt_chars="%(!.%F{red}# .%F{green}${bt_prompt_chars}%f)"
+    bt_prompt_chars="%(!.%F{red}${bt_prompt_chars_root}.%F{green}${bt_prompt_chars}%f)"
   fi
 
   if [[ $BULLETTRAIN_PROMPT_SEPARATE_LINE == false ]]; then
@@ -621,7 +632,7 @@ prompt_line_sep() {
   fi
 }
 
-### Custom addition: Historical number
+# Custom addition: Historical number
 prompt_historical() {
   prompt_segment $PERSONAL_ADD_HISTORICAL_BG $PERSONAL_ADD_HISTORICAL_FG "!%!"
 }
