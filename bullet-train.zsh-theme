@@ -34,6 +34,8 @@ if [ ! -n "${BULLETTRAIN_PROMPT_ORDER+1}" ]; then
     git
     hg
     cmd_exec_time
+    # custom addition
+    historical
   )
 fi
 
@@ -296,6 +298,14 @@ if [ ! -n "${BULLETTRAIN_EXEC_TIME_BG+1}" ]; then
 fi
 if [ ! -n "${BULLETTRAIN_EXEC_TIME_FG+1}" ]; then
   BULLETTRAIN_EXEC_TIME_FG=black
+fi
+
+# Custom addition: Colors options for historical number
+if [ ! -n "${PERSONAL_ADD_HISTORICAL_BG+1}" ]; then
+  PERSONAL_ADD_HISTORICAL_BG=black
+fi
+if [ ! -n "${PERSONAL_ADD_HISTORICAL_FG+1}" ]; then
+  PERSONAL_ADD_HISTORICAL_FG=blue
 fi
 
 
@@ -610,6 +620,12 @@ prompt_line_sep() {
     echo -e '\n%{\u200B%}'
   fi
 }
+
+### Custom addition: Historical number
+prompt_historical() {
+  prompt_segment $PERSONAL_ADD_HISTORICAL_BG $PERSONAL_ADD_HISTORICAL_FG "!%!"
+}
+
 
 # ------------------------------------------------------------------------------
 # MAIN
