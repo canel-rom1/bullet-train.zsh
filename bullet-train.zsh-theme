@@ -30,6 +30,7 @@ if [ ! -n "${BULLETTRAIN_PROMPT_ORDER+1}" ]; then
     nvm
     aws
     go
+    rust
     elixir
     git
     hg
@@ -142,6 +143,28 @@ if [ ! -n "${BULLETTRAIN_GO_FG+1}" ]; then
 fi
 if [ ! -n "${BULLETTRAIN_GO_PREFIX+1}" ]; then
   BULLETTRAIN_GO_PREFIX="go"
+fi
+
+# Rust
+if [ ! -n "${BULLETTRAIN_RUST_BG+1}" ]; then
+  BULLETTRAIN_RUST_BG=black
+fi
+if [ ! -n "${BULLETTRAIN_RUST_FG+1}" ]; then
+  BULLETTRAIN_RUST_FG=white
+fi
+if [ ! -n "${BULLETTRAIN_RUST_PREFIX+1}" ]; then
+  BULLETTRAIN_RUST_PREFIX="🦀"
+fi
+
+# Kubernetes Context
+if [ ! -n "${BULLETTRAIN_KCTX_BG+1}" ]; then
+  BULLETTRAIN_KCTX_BG=yellow
+fi
+if [ ! -n "${BULLETTRAIN_KCTX_FG+1}" ]; then
+  BULLETTRAIN_KCTX_FG=white
+fi
+if [ ! -n "${BULLETTRAIN_KCTX_PREFIX+1}" ]; then
+  BULLETTRAIN_KCTX_PREFIX="⎈"
 fi
 
 # ELIXIR
@@ -538,6 +561,27 @@ prompt_go() {
   fi
 }
 
+# Rust
+prompt_rust() {
+  if [[ (-f Cargo.toml) ]]; then
+    if command -v rustc > /dev/null 2>&1; then
+      prompt_segment $BULLETTRAIN_RUST_BG $BULLETTRAIN_RUST_FG $BULLETTRAIN_RUST_PREFIX" $(rustc -V version | cut -d' ' -f2)"
+    fi
+  fi
+}
+
+# Kubernetes Context
+prompt_kctx() {
+  if [[ ! -n $BULLETTRAIN_KCTX_KCONFIG ]]; then
+    return
+  fi
+  if command -v kubectl > /dev/null 2>&1; then
+    if [[ -f $BULLETTRAIN_KCTX_KCONFIG ]]; then
+      prompt_segment $BULLETTRAIN_KCTX_BG $BULLETTRAIN_KCTX_FG $BULLETTRAIN_KCTX_PREFIX" $(cat $BULLETTRAIN_KCTX_KCONFIG|grep current-context| awk '{print $2}')"
+    fi  
+  fi
+}
+
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
@@ -621,7 +665,11 @@ prompt_chars() {
     bt_prompt_chars="${bt_prompt_chars}"
   fi
 
-  echo -n "$bt_prompt_chars "
+  echo -n "$bt_prompt_chars"
+
+  if [[ -n $BULLETTRAIN_PROMPT_CHAR ]]; then
+    echo -n " "
+  fi
 }
 
 # Prompt Line Separator
